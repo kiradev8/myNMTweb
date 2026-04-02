@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>НМТ Історія України - Тренажер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timer-container {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(238, 90, 90, 0.3);
+        }
+
+        .timer-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .timer {
+            font-size: 2.5em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer.warning {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            color: #1e3c72;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .answer-btn {
+            padding: 18px 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 12px;
+            text-align: left;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            line-height: 1.5;
+            -webkit-appearance: none;
+        }
+
+        .answer-btn:hover:not(:disabled) {
+            border-color: #1e3c72;
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+
+        .answer-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .answer-btn:disabled {
+            cursor: default;
+        }
+
+        .answer-btn.correct {
+            background: #c8e6c9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        .answer-btn.wrong {
+            background: #ffcdd2;
+            border-color: #f44336;
+            color: #c62828;
+        }
+
+        .answer-btn.selected {
+            border-color: #1e3c72;
+            background: #e3f2fd;
+        }
+
+        .explanation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 10px 10px 0;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .explanation-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s;
+            font-family: inherit;
+            font-weight: 600;
+            -webkit-appearance: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(30, 60, 114, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 20px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .start-screen, .results-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .start-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .feature-title {
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .feature-desc {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .results-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .score-big {
+            font-size: 3em;
+            font-weight: bold;
+            color: #1e3c72;
+            margin: 20px 0;
+        }
+
+        .score-message {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .detail-stats {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .review-question {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: left;
+        }
+
+        .review-question.correct {
+            border-left: 4px solid #4caf50;
+        }
+
+        .review-question.wrong {
+            border-left: 4px solid #f44336;
+        }
+
+        .review-status {
+            float: right;
+            font-size: 1.2em;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: 12px 20px;
+            border: 2px solid #1e3c72;
+            background: white;
+            color: #1e3c72;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .mode-btn.active {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.5em;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 480px) {
+            header h1 { font-size: 1.6em; }
+            .timer { font-size: 2em; }
+            .features { grid-template-columns: 1fr; }
+            .question-text { font-size: 1.1em; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>📜 НМТ Історія України</h1>
+        <p>Повноцінний тренажер для підготовки</p>
+    </header>
+
+    <!-- Екран початку -->
+    <div class="card start-screen" id="start-screen">
+        <div class="start-icon">🏛️</div>
+        <h2 style="color: #1e3c72; margin-bottom: 15px;">Готовий перевірити свої знання?</h2>
+        <p style="color: #666; margin-bottom: 25px;">Обери режим тестування:</p>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="selectMode('exam', this)">📝 Екзамен (60 хв)</button>
+            <button class="mode-btn" onclick="selectMode('quick', this)">⚡ Швидкий (20 хв)</button>
+            <button class="mode-btn" onclick="selectMode('practice', this)">📚 Практика (без часу)</button>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⏱️</div>
+                <div class="feature-title">Таймер</div>
+                <div class="feature-desc">Як на справжньому НМТ</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <div class="feature-title">30 питань</div>
+                <div class="feature-desc">З усіх періодів історії</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">✅</div>
+                <div class="feature-title">Перевірка</div>
+                <div class="feature-desc">Миттєва перевірка відповідей</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📈</div>
+                <div class="feature-title">Статистика</div>
+                <div class="feature-desc">Детальний аналіз результатів</div>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="startTest()">Почати тестування →</button>
+    </div>
+
+    <!-- Екран тестування -->
+    <div class="card hidden" id="quiz-screen">
+        <div class="timer-container" id="timer-container">
+            <div class="timer-label">Залишилося часу</div>
+            <div class="timer" id="timer">60:00</div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-value" id="current-q">1</div>
+                <div class="stat-label">Питання</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="answered-count">0</div>
+                <div class="stat-label">Відповідей</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="correct-count">0</div>
+                <div class="stat-label">Правильно</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+
+        <div class="question-card">
+            <div class="question-number">Питання <span id="q-number">1</span> з 30</div>
+            <div class="question-text" id="question-text">Завантаження...</div>
+            
+            <div class="answers" id="answers-container">
+                <!-- Відповіді генеруються JS -->
+            </div>
+
+            <div class="explanation" id="explanation">
+                <div class="explanation-title">📖 Пояснення:</div>
+                <div id="explanation-text"></div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-secondary" onclick="prevQuestion()" id="prev-btn" style="flex: 1;">← Назад</button>
+            <button class="btn-primary" onclick="nextQuestion()" id="next-btn" style="flex: 2;">Наступне питання →</button>
+        </div>
+        
+        <button class="btn-secondary" onclick="finishTestEarly()" style="width: 100%; margin-top: 10px; color: #ff6b6b;">
+            Завершити тест достроково
+        </button>
+    </div>
+
+    <!-- Екран результатів -->
+    <div class="card hidden results-screen" id="results-screen">
+        <div class="results-icon" id="result-icon">🏆</div>
+        <h2 style="color: #1e3c72; margin-bottom: 10px;">Тест завершено!</h2>
+        
+        <div class="score-big" id="final-score">0/30</div>
+        <div class="score-message" id="score-message">Чудовий результат!</div>
+
+        <div class="detail-stats">
+            <div class="detail-row">
+                <span>Правильних відповідей:</span>
+                <strong id="detail-correct">0</strong>
+            </div>
+            <div class="detail-row">
+                <span>Неправильних відповідей:</span>
+                <strong id="detail-wrong">0</strong>
+            </div>
+            <div class="detail-row">
+                <span>Відсоток правильних:</span>
+                <strong id="detail-percent">0%</strong>
+            </div>
+            <div class="detail-row">
+                <span>Витрачено часу:</span>
+                <strong id="detail-time">0:00</strong>
+            </div>
+            <div class="detail-row">
+                <span>Середній бал (200):</span>
+                <strong id="detail-nmt">0</strong>
+            </div>
+        </div>
+
+        <h3 style="color: #1e3c72; margin: 20px 0 10px; text-align: left;">Огляд помилок:</h3>
+        <div id="review-container" style="max-height: 300px; overflow-y: auto;">
+            <!-- Помилки для перегляду -->
+        </div>
+
+        <button class="btn-primary" onclick="restartTest()" style="margin-top: 20px;">Спробувати ще раз ↺</button>
+        <button class="btn-secondary" onclick="backToStart()" style="width: 100%;">← На головну</button>
+    </div>
+</div>
+
+<!-- Кнопка довідки -->
+<button class="floating-btn" onclick="showHelp()">?</button>
+
+<script>
+// База питань НМТ з історії України (30 питань)
+const historyQuestions = [
+    {
+        q: "У якому році було прийнято Конституцію Пилипа Орлика?",
+        a: ["1708", "1710", "1722", "1734"],
+        correct: 1,
+        explanation: "Конституція Пилипа Орлика була прийнята 5 квітня 1710 року - перша в Європі конституція."
+    },
+    {
+        q: "Хто був автором 'Історії русів'?",
+        a: ["Михайло Максимович", "Микола Костомаров", "Невідомий автор", "Пантелеймон Куліш"],
+        correct: 2,
+        explanation: "Автор 'Історії русів' невідомий, хоча приписували Максимовичу, Костомарову та іншим."
+    },
+    {
+        q: "Коли відбулася Люблінська унія, що об'єднала Польщу та Литву?",
+        a: ["1385", "1569", "1596", "1654"],
+        correct: 1,
+        explanation: "Люблінська унія 1569 року об'єднала Королівство Польське та Велике князівство Литовське."
+    },
+    {
+        q: "Хто очолив Українську Центральну Раду?",
+        a: ["Симон Петлюра", "Михайло Грушевський", "Володимир Винниченко", "Павло Скоропадський"],
+        correct: 1,
+        explanation: "Михайло Грушевський очолив Українську Центральну Раду з березня 1917 року."
+    },
+    {
+        q: "У якому році було проголошено Акт злуки УНР та ЗУНР?",
+        a: ["1918", "1919", "1920", "1921"],
+        correct: 1,
+        explanation: "Акт Злуки був проголошений 22 січня 1919 року на Софійській площі в Києві."
+    },
+    {
+        q: "Хто був гетьманом під час Північної війни 1700-1721 років?",
+        a: ["Іван Мазепа", "Петро Дорошенко", "Кирило Розумовський", "Павло Полуботок"],
+        correct: 0,
+        explanation: "Іван Мазепа був гетьманом з 1687 по 1708 рік і перейшов на бік Карла XII."
+    },
+    {
+        q: "Коли було засновано Києво-Могилянську академію?",
+        a: ["1615", "1632", "1654", "1701"],
+        correct: 1,
+        explanation: "Києво-Могилянська колегія (пізніше академія) була заснована 1632 року Петром Могилою."
+    },
+    {
+        q: "Яка битва 1648 року стала переломною у визвольній війні під проводом Богдана Хмельницького?",
+        a: ["Битва під Берестечком", "Битва під Жовтими Водами", "Битва під Корсунем", "Битва під Зборовом"],
+        correct: 2,
+        explanation: "Битва під Корсунем 15-17 травня 1648 року - перша велика перемога повстанців."
+    },
+    {
+        q: "Хто був останнім кошовим отаманом Запорозької Січі?",
+        a: ["Іван Сірко", "Петро Калнишевський", "Костянтин Гордієнко", "Іван Мазепа"],
+        correct: 1,
+        explanation: "Петро Калнишевський був останнім кошовим отаманом (1762-1775)."
+    },
+    {
+        q: "У якому році було скасовано кріпацтво в Російській імперії?",
+        a: ["1860", "1861", "1863", "1871"],
+        correct: 1,
+        explanation: "Кріпацтво було скасовано маніфестом Олександра II 19 лютого (3 березня) 1861 року."
+    },
+    {
+        q: "Який договір 1654 року визначив відносини між Гетьманщиною та Московським царством?",
+        a: ["Гадяцький договір", "Білоцерківський договір", "Пereяславська угода", "Бучацький договір"],
+        correct: 2,
+        explanation: "Пereяславська рада та угода відбулися 8 (18) січня 1654 року."
+    },
+    {
+        q: "Хто очолював Директорію УНР?",
+        a: ["Симон Петлюра", "Володимир Винниченко", "Михайло Грушевський", "Павло Скоропадський"],
+        correct: 0,
+        explanation: "Симон Петлюра очолював Директорію з лютого 1919 року."
+    },
+    {
+        q: "Коли було проголошено незалежність України?",
+        a: ["24 серпня 1990", "24 серпня 1991", "1 грудня 1991", "28 червня 1996"],
+        correct: 1,
+        explanation: "Акт проголошення незалежності України прийнятий 24 серпня 1991 року."
+    },
+    {
+        q: "Хто був першим президентом незалежної України?",
+        a: ["Леонід Кравчук", "Леонід Кучма", "Віктор Ющенко", "Віктор Янукович"],
+        correct: 0,
+        explanation: "Леонід Кравчук став першим президентом, обраним 1 грудня 1991 року."
+    },
+    {
+        q: "У якому році відбулася битва під Грюнвальдом?",
+        a: ["1385", "1410", "1430", "1450"],
+        correct: 1,
+        explanation: "Битва під Грюнвальдом відбулася 15 липня 1410 року."
+    },
+    {
+        q: "Яка держава була створена Богданом Хмельницьким?",
+        a: ["Українська Народна Республіка", "Гетьманщина (Військо Запорозьке)", "Західноукраїнська Народна Республіка", "Київська Русь"],
+        correct: 1,
+        explanation: "Богдан Хмельницький створив Гетьманщину (Військо Запорозьке) як козацьку державу."
+    },
+    {
+        q: "Хто був автором першого друкованого букваря у слов'янському світі?",
+        a: ["Іван Федоров", "Петро Могила", "Кирило і Мефодій", "Франциск Скорина"],
+        correct: 0,
+        explanation: "Іван Федоров видав 'Азбуку' (буквар) у Львові 1574 року."
+    },
+    {
+        q: "Коли було прийнято Конституцію України?",
+        a: ["1991", "1994", "1996", "2004"],
+        correct: 2,
+        explanation: "Конституція України прийнята 28 червня 1996 року."
+    },
+    {
+        q: "Яка подія відбулася 30 червня 1941 року у Львові?",
+        a: ["Проголошення Акту відновлення Української Держави", "Утворення ОУН", "Початок операції 'Вісла'", "Утворення УПА"],
+        correct: 0,
+        explanation: "30 червня 1941 року Ярослав Стецько проголосив Акт відновлення Української Держави."
+    },
+    {
+        q: "Хто очолив Українську повстанську армію (УПА)?",
+        a: ["Степан Бандера", "Роман Шухевич", "Андрій Мельник", "Василь Кук"],
+        correct: 1,
+        explanation: "Роман Шухевич (Тарас Чупринка) був головним командиром УПА з 1943 року."
+    },
+    {
+        q: "У якому році було проведено адміністративну реформу, що ліквідувала губернії та створила області?",
+        a: ["1917", "1920", "1932", "1939"],
+        correct: 2,
+        explanation: "У 1932 році було створено перші 7 областей замість губерній."
+    },
+    {
+        q: "Яка була столиця Галицько-Волинського князівства за Данила Галицького?",
+        a: ["Київ", "Галич", "Холм", "Львів"],
+        correct: 2,
+        explanation: "Данило Галицький переніс столицю до Холма після походу на Київ 1240 року."
+    },
+    {
+        q: "Хто був останнім великим князем Київським перед монгольською навалою?",
+        a: ["Мстислав Удатний", "Роман Мстиславич", "Ярослав Всеволодович", "Данило Галицький"],
+        correct: 0,
+        explanation: "Мстислав Удатний (Мстислав III) був останнім великим князем київським (1212-1223)."
+    },
+    {
+        q: "Коли було засновано місто Київ за літописом?",
+        a: ["482", "522", "602", "882"],
+        correct: 0,
+        explanation: "За літописом Нестора, Київ засновано 482 року (за іншими версіями - VI століття)."
+    },
+    {
+        q: "Хто хрестив Русь?",
+        a: ["Олег", "Ігор", "Святослав", "Володимир Великий"],
+        correct: 3,
+        explanation: "Князь Володимир Святославич хрестив Русь у 988 році."
+    },
+    {
+        q: "Яка битва 1380 року показала зростання московської держави?",
+        a: ["Битва на Калці", "Битва на Вожі", "Куликовська битва", "Битва під Грюнвальдом"],
+        correct: 2,
+        explanation: "Куликовська битва 1380 року - перемога Дмитра Донського над монголами."
+    },
+    {
+        q: "У якому році було підписано Брестський мирний договір?",
+        a: ["1916", "1917", "1918", "1919"],
+        correct: 2,
+        explanation: "Брестський мир між УНР та державами Четверного союзу підписано 9 лютого 1918 року."
+    },
+    {
+        q: "Хто був головою Ради Народних Комісарів УСРР у 1919-1923 роках?",
+        a: ["Християн Раковський", "Влас Чубар", "Панас Любченко", "Микола Скрипник"],
+        correct: 0,
+        explanation: "Християн Раковський очолював уряд УСРР з 1919 по 1923 рік."
+    },
+    {
+        q: "Коли було створено Організацію українських націоналістів (ОУН)?",
+        a: ["1923", "1929", "1939", "1942"],
+        correct: 1,
+        explanation: "ОУН створено у 1929 році у Відні об'єднанням кількох організацій."
+    },
+    {
+        q: "Яка подія відома як 'Революція на граніті'?",
+        a: ["Студентське голодування 1990 року", "Помаранчева революція 2004", "Революція Гідності 2014", "Жовтневий переворот 1917"],
+        correct: 0,
+        explanation: "'Революція на граніті' - студентське голодування жовтня 1990 року у Києві."
+    }
+];
+
+let currentMode = 'exam';
+let timeLimit = 3600; // секунди (60 хв)
+let timeLeft = 3600;
+let timerInterval;
+let currentQuestionIndex = 0;
+let userAnswers = new Array(30).fill(null);
+let shuffledQuestions = [];
+let testStartTime;
+let isAnswered = false;
+
+function selectMode(mode, btn) {
+    currentMode = mode;
+    
+    // Update UI
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    // Set time limits
+    switch(mode) {
+        case 'exam':
+            timeLimit = 3600; // 60 хв
+            break;
+        case 'quick':
+            timeLimit = 1200; // 20 хв
+            break;
+        case 'practice':
+            timeLimit = 0; // без обмеження
+            break;
+    }
+    
+    timeLeft = timeLimit;
+    updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+    if (currentMode === 'practice') {
+        document.getElementById('timer').textContent = '∞';
+        return;
+    }
+    
+    const mins = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+    const secs = (timeLeft % 60).toString().padStart(2, '0');
+    document.getElementById('timer').textContent = `${mins}:${secs}`;
+    
+    // Warning colors
+    const timerContainer = document.getElementById('timer-container');
+    if (timeLeft < 300) { // менше 5 хв
+        timerContainer.style.background = 'linear-gradient(135deg, #ff4757 0%, #ee5a5a 100%)';
+        document.getElementById('timer').classList.add('warning');
+    } else if (timeLeft < 600) { // менше 10 хв
+        timerContainer.style.background = 'linear-gradient(135deg, #ffa502 0%, #ff6348 100%)';
+    }
+}
+
+function startTimer() {
+    if (currentMode === 'practice') return;
+    
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        
+        if (timeLeft <= 0) {
+            finishTest();
+        }
+    }, 1000);
+}
+
+function shuffleArray(array) {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
+function startTest() {
+    // Shuffle questions
+    shuffledQuestions = shuffleArray(historyQuestions).slice(0, 30);
+    currentQuestionIndex = 0;
+    userAnswers = new Array(30).fill(null);
+    testStartTime = Date.now();
+    isAnswered = false;
+    
+    // Reset UI
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.add('hidden');
+    document.getElementById('quiz-screen').classList.remove('hidden');
+    
+    // Reset timer styles
+    document.getElementById('timer-container').style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%)';
+    document.getElementById('timer').classList.remove('warning');
+    
+    updateTimerDisplay();
+    startTimer();
+    showQuestion();
+    updateStats();
+}
+
+function showQuestion() {
+    const q = shuffledQuestions[currentQuestionIndex];
+    isAnswered = userAnswers[currentQuestionIndex] !== null;
+    
+    // Update numbers
+    document.getElementById('q-number').textContent = currentQuestionIndex + 1;
+    document.getElementById('current-q').textContent = currentQuestionIndex + 1;
+    
+    // Update question
+    document.getElementById('question-text').textContent = q.q;
+    
+    // Create answers
+    const container = document.getElementById('answers-container');
+    container.innerHTML = '';
+    
+    q.a.forEach((answer, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = answer;
+        
+        // Show previous answer if exists
+        if (userAnswers[currentQuestionIndex] === index) {
+            btn.classList.add('selected');
+            if (isAnswered) {
+                if (index === q.correct) {
+                    btn.classList.add('correct');
+                } else {
+                    btn.classList.add('wrong');
+                }
+            }
+        } else if (isAnswered && index === q.correct) {
+            btn.classList.add('correct');
+        }
+        
+        if (isAnswered) {
+            btn.disabled = true;
+        } else {
+            btn.onclick = () => selectAnswer(index);
+        }
+        
+        container.appendChild(btn);
+    });
+    
+    // Show explanation if answered
+    const explanation = document.getElementById('explanation');
+    if (isAnswered) {
+        document.getElementById('explanation-text').textContent = q.explanation;
+        explanation.classList.add('show');
+    } else {
+        explanation.classList.remove('show');
+    }
+    
+    // Update buttons
+    document.getElementById('prev-btn').disabled = currentQuestionIndex === 0;
+    document.getElementById('next-btn').textContent = 
+        currentQuestionIndex === 29 ? 'Завершити тест ✓' : 'Наступне питання →';
+    
+    // Update progress
+    const progress = ((currentQuestionIndex + 1) / 30) * 100;
+    document.getElementById('progress').style.width = progress + '%';
+    
+    updateStats();
+}
+
+function selectAnswer(index) {
+    if (isAnswered) return;
+    
+    const q = shuffledQuestions[currentQuestionIndex];
+    userAnswers[currentQuestionIndex] = index;
+    isAnswered = true;
+    
+    const buttons = document.querySelectorAll('.answer-btn');
+    
+    buttons.forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === index) {
+            btn.classList.add('selected');
+            if (i === q.correct) {
+                btn.classList.add('correct');
+            } else {
+                btn.classList.add('wrong');
+            }
+        } else if (i === q.correct) {
+            btn.classList.add('correct');
+        }
+    });
+    
+    // Show explanation
+    document.getElementById('explanation-text').textContent = q.explanation;
+    document.getElementById('explanation').classList.add('show');
+    
+    updateStats();
+}
+
+function nextQuestion() {
+    if (currentQuestionIndex < 29) {
+        currentQuestionIndex++;
+        showQuestion();
+    } else {
+        finishTest();
+    }
+}
+
+function prevQuestion() {
+    if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        showQuestion();
+    }
+}
+
+function finishTestEarly() {
+    if (confirm('Ви впевнені, що хочете завершити тест? Незавершені питання будуть вважатися помилковими.')) {
+        finishTest();
+    }
+}
+
+function finishTest() {
+    clearInterval(timerInterval);
+    
+    const correct = userAnswers.filter((ans, i) => ans === shuffledQuestions[i].correct).length;
+    const answered = userAnswers.filter(ans => ans !== null).length;
+    const timeSpent = Math.floor((Date.now() - testStartTime) / 1000);
+    
+    // Calculate NMT score (approximate)
+    const nmtScore = Math.round(100 + (correct / 30) * 100);
+    
+    // Show results
+    document.getElementById('quiz-screen').classList.add('hidden');
+    document.getElementById('results-screen').classList.remove('hidden');
+    
+    // Update score display
+    document.getElementById('final-score').textContent = `${correct}/30`;
+    
+    // Message based on score
+    let message = '';
+    let icon = '';
+    if (correct >= 27) {
+        message = '🌟 Відмінно! Ти експерт з історії!';
+        icon = '🏆';
+    } else if (correct >= 21) {
+        message = '👍 Дуже добре! Солідний результат!';
+        icon = '🥈';
+    } else if (correct >= 15) {
+        message = '✓ Непогано, але є куди рости!';
+        icon = '📚';
+    } else {
+        message = '📖 Потрібно більше практики!';
+        icon = '💪';
+    }
+    
+    document.getElementById('score-message').textContent = message;
+    document.getElementById('result-icon').textContent = icon;
+    
+    // Detail stats
+    document.getElementById('detail-correct').textContent = correct;
+    document.getElementById('detail-wrong').textContent = 30 - correct;
+    document.getElementById('detail-percent').textContent = Math.round((correct/30)*100) + '%';
+    
+    const mins = Math.floor(timeSpent / 60);
+    const secs = (timeSpent % 60).toString().padStart(2, '0');
+    document.getElementById('detail-time').textContent = `${mins}:${secs}`;
+    document.getElementById('detail-nmt').textContent = `~${nmtScore}`;
+    
+    // Review wrong answers
+    const reviewContainer = document.getElementById('review-container');
+    reviewContainer.innerHTML = '';
+    
+    const wrongAnswers = userAnswers.map((ans, i) => ({ans, i})).filter(({ans, i}) => ans !== shuffledQuestions[i].correct);
+    
+    if (wrongAnswers.length === 0) {
+        reviewContainer.innerHTML = '<div style="text-align: center; color: #4caf50; padding: 20px;">🎉 Жодної помилки! Ідеально!</div>';
+    } else {
+        wrongAnswers.forEach(({i}) => {
+            const q = shuffledQuestions[i];
+            const userAns = userAnswers[i];
+            
+            const div = document.createElement('div');
+            div.className = `review-question ${userAns === null ? 'wrong' : 'wrong'}`;
+            div.innerHTML = `
+                <span class="review-status">${userAns === null ? '⏱️' : '❌'}</span>
+                <strong>Питання ${i + 1}:</strong> ${q.q}<br>
+                <span style="color: #666; font-size: 0.9em;">
+                    Твоя відповідь: ${userAns === null ? 'не встиг' : q.a[userAns]}<br>
+                    Правильно: <span style="color: #4caf50; font-weight: bold;">${q.a[q.correct]}</span>
+                </span>
+            `;
+            reviewContainer.appendChild(div);
+        });
+    }
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateStats() {
+    const answered = userAnswers.filter(ans => ans !== null).length;
+    const correct = userAnswers.filter((ans, i) => ans === shuffledQuestions[i]?.correct).length;
+    
+    document.getElementById('answered-count').textContent = answered;
+    document.getElementById('correct-count').textContent = correct;
+}
+
+function restartTest() {
+    startTest();
+}
+
+function backToStart() {
+    document.getElementById('results-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showHelp() {
+    alert(`📜 НМТ Історія України - Довідка
+
+🎯 Режими:
+• Екзамен (60 хв) - як справжній НМТ
+• Швидкий (20 хв) - для інтенсивної практики  
+• Практика - без обмеження часу
+
+⚠️ Підказки:
+• Відповідайте на всі питання
+• Читайте пояснення після відповіді
+• Можна повернутися до попередніх питань
+• Тест завершується автоматично при закінченні часу
+
+🏆 Успіхів на НМТ!`);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    timeLeft = timeLimit;
+    updateTimerDisplay();
+    
+    // Prevent zoom
+    document.addEventListener('gesturestart', e => e.preventDefault());
+    document.addEventListener('gesturechange', e => e.preventDefault());
+    document.addEventListener('gestureend', e => e.preventDefault());
+});
+</script>
+
+</body>
+</html>
